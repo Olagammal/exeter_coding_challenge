@@ -34,6 +34,7 @@ const readFileToArray = (filePath) => {
 }
 
 const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
+    let finalEnglishCount = EnglishToCount
     let finalFileLines = []
     let allWords = Object.keys(EnglishToFrench)
     for (line of FileLineArray) {
@@ -58,12 +59,14 @@ const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
                     default:
                         break
                 }
+                finalEnglishCount = increaseCount(testWord.toLowerCase(), finalEnglishCount)
             }
             finalListOfWords.push(currentWord)
         }
         finalFileLines.push(finalListOfWords.join(" "))
     }
-    console.log(finalFileLines)
+    // console.log(finalFileLines)
+    console.log(finalEnglishCount)
 }
 
 const checkWordFormat = (word) => {
@@ -83,6 +86,11 @@ const capitalizeWord = (word) => {
     return word[0].toUpperCase() + word.substring(1)
 }
 
+const increaseCount = (word, hashMap) => {
+    let count = parseInt(hashMap[word.toLowerCase()])
+    hashMap[word.toLowerCase()] = count + 1
+    return hashMap
+}
 
 //contains main flow
 const main = async () => {
