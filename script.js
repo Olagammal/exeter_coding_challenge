@@ -38,11 +38,11 @@ const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
     let allWords = Object.keys(EnglishToFrench)
     for (line of FileLineArray) {
         let FileWords = line.split(" ")
+        let finalListOfWords = []
         for (word of FileWords) {
             let currentWord = word
             let testWord = word.replace(/[`~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '')
             if (allWords.includes(testWord.toLowerCase())) {
-                console.log(checkWordFormat(testWord))
                 let wordFormat = checkWordFormat(testWord)
                 let equivalentFrenchWord = EnglishToFrench[testWord.toLowerCase()]
                 switch (wordFormat) {
@@ -58,11 +58,12 @@ const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
                     default:
                         break
                 }
-                console.log(word, currentWord)
             }
+            finalListOfWords.push(currentWord)
         }
+        finalFileLines.push(finalListOfWords.join(" "))
     }
-
+    console.log(finalFileLines)
 }
 
 const checkWordFormat = (word) => {
