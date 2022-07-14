@@ -155,6 +155,23 @@ const writeToTextFile = (arrayOfLines, path) => {
     fs.writeFileSync(path, finalString)
 }
 
+//miliseconds to seconds and minutes
+const msTosecMin = (milliseconds) => {
+    return [milliseconds / 1000, Math.round(milliseconds / (1000 * 60))]
+}
+
+//bytes to mb
+const bytesToMb = (bytes) => {
+    return bytes / (1024 * 1024)
+}
+
+//create performance file
+const createPerformanceFile = (path, time, memory) => {
+    fileContent = 'Time to process: ' + time[1] + ' minutes ' + time[0] + ' seconds\n'
+    fileContent += 'Memory used: ' + memory + ' MB'
+    fs.writeFileSync(path, fileContent)
+}
+
 //contains main flow
 const main = async () => {
     let EnglishToFrench = await readCSVToObj('./input_files/french_dictionary.csv')
@@ -169,5 +186,8 @@ const main = async () => {
 
 }
 
-
+var startTime = performance.now()
 main()
+var endTime = performance.now()
+createPerformanceFile('./output_files/performance.txt', msTosecMin(endTime - startTime), bytesToMb(process.memoryUsage().heapUsed))
+
