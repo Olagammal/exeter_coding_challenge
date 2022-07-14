@@ -42,31 +42,67 @@ const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
         let finalListOfWords = []
         for (word of FileWords) {
             let currentWord = word
-            let testWord = word.replace(/[`~!@#$%^&*()_|+\-=?;:",.<>\{\}\[\]\\\/]/gi, '')
-            if (allWords.includes(testWord.toLowerCase())) {
-                let wordFormat = checkWordFormat(testWord)
-                let equivalentFrenchWord = EnglishToFrench[testWord.toLowerCase()]
-                switch (wordFormat) {
-                    case 0:
-                        currentWord = currentWord = currentWord.replace(testWord, equivalentFrenchWord.toLowerCase())
-                        break
-                    case 1:
-                        currentWord = currentWord = currentWord.replace(testWord, capitalizeWord(equivalentFrenchWord))
-                        break
-                    case 2:
-                        currentWord = currentWord = currentWord.replace(testWord, equivalentFrenchWord.toUpperCase())
-                        break
-                    default:
-                        break
+            if (currentWord.includes('-')) {
+                let tempWordArray = currentWord.split('-')
+                let fullWord = currentWord
+                for (word of tempWordArray) {
+                    let testWord = word.replace(/[`~!@#$%^&*()_|+\=?;:",.<>\{\}\[\]\\\/]/gi, '')
+                    // console.log(testWord)
+                    if (allWords.includes(testWord.toLowerCase())) {
+                        let wordFormat = checkWordFormat(testWord)
+                        let equivalentFrenchWord = EnglishToFrench[testWord.toLowerCase()]
+                        switch (wordFormat) {
+                            case 0:
+                                fullWord = fullWord.replace(testWord, equivalentFrenchWord.toLowerCase())
+                                break
+                            case 1:
+                                fullWord = fullWord.replace(testWord, capitalizeWord(equivalentFrenchWord))
+                                break
+                            case 2:
+                                fullWord = fullWord.replace(testWord, equivalentFrenchWord.toUpperCase())
+                                break
+                            default:
+                                break
+                        }
+                        // console.log(testWord, finalEnglishCount[testWord.toLowerCase()])
+                        finalEnglishCount = increaseCount(testWord.toLowerCase(), finalEnglishCount)
+                        // console.log(testWord, finalEnglishCount[testWord.toLowerCase()])
+                    }
                 }
-                finalEnglishCount = increaseCount(testWord.toLowerCase(), finalEnglishCount)
+                // console.log(fullWord)
+            }
+            else {
+                let testWord = currentWord.replace(/[`~!@#$%^&*()_|+\=?;:",.<>\{\}\[\]\\\/]/gi, '')
+                if (allWords.includes(testWord.toLowerCase())) {
+                    let wordFormat = checkWordFormat(testWord)
+                    let equivalentFrenchWord = EnglishToFrench[testWord.toLowerCase()]
+                    switch (wordFormat) {
+                        case 0:
+                            currentWord = currentWord = currentWord.replace(testWord, equivalentFrenchWord.toLowerCase())
+                            break
+                        case 1:
+                            currentWord = currentWord = currentWord.replace(testWord, capitalizeWord(equivalentFrenchWord))
+                            break
+                        case 2:
+                            currentWord = currentWord = currentWord.replace(testWord, equivalentFrenchWord.toUpperCase())
+                            break
+                        default:
+                            break
+                    }
+                    finalEnglishCount = increaseCount(testWord.toLowerCase(), finalEnglishCount)
+                }
+                //test the not included cases
+                // else {
+                //     if (testWord.includes('watch')) {
+                //         console.log('teeee', testWord)
+                //     }
+                // }
             }
             finalListOfWords.push(currentWord)
         }
         finalFileLines.push(finalListOfWords.join(" "))
     }
-    // console.log(finalFileLines)
-    console.log(finalEnglishCount)
+    return [finalFileLines, finalEnglishCount]
 }
 
 const checkWordFormat = (word) => {
@@ -92,12 +128,26 @@ const increaseCount = (word, hashMap) => {
     return hashMap
 }
 
+//write to csv file
+const writeToCsv = (EnglishToFrench, EnglishToCount, path) => {
+    const fileHeader = 'English Word,French Word,Frequency'
+    fs.writeFileSync(path, fileHeader)
+    for (english in EnglishToFrench) {
+        let arrayToAppend = '\n' + english + ',' + EnglishToFrench[english] + ',' + EnglishToCount[english]
+        // fs.appendFileSync(path, '\nabc')
+        fs.appendFileSync(path, arrayToAppend)
+    }
+}
+
 //contains main flow
 const main = async () => {
-    const EnglishToFrench = await readCSVToObj('./input_files/french_dictionary.csv')
-    const EnglishToCount = readTextFileToObj('./input_files/find_words.txt')
-    const InputFileArray = readFileToArray('./input_files/t8.shakespeare.txt')
-    replaceWords(InputFileArray, EnglishToFrench, EnglishToCount)
+    let EnglishToFrench = await readCSVToObj('./input_files/french_dictionary.csv')
+    let EnglishToCount = readTextFileToObj('./input_files/find_words.txt')
+    let InputFileArray = readFileToArray('./input_files/t8.shakespeare.txt')
+    let returnedValues = replaceWords(InputFileArray, EnglishToFrench, EnglishToCount)
+    let outputFileLines = returnedValues[0]
+    EnglishToCount = returnedValues[1]
+    // writeToCsv(EnglishToFrench, EnglishToCount, './output_files/frequency.csv')
     // console.log(InputFileArray)
 
 }
