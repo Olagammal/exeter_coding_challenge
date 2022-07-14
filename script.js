@@ -34,6 +34,8 @@ const readFileToArray = (filePath) => {
 }
 
 const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
+    //FOR TESTING
+    // let count = 0
     let finalEnglishCount = EnglishToCount
     let finalFileLines = []
     let allWords = Object.keys(EnglishToFrench)
@@ -69,6 +71,7 @@ const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
                         // console.log(testWord, finalEnglishCount[testWord.toLowerCase()])
                     }
                 }
+                currentWord = fullWord
                 // console.log(fullWord)
             }
             else {
@@ -93,9 +96,13 @@ const replaceWords = (FileLineArray, EnglishToFrench, EnglishToCount) => {
                 }
                 //test the not included cases
                 // else {
-                //     if (testWord.includes('watch')) {
-                //         console.log('teeee', testWord)
+
+                //     if (testWord.includes('WATCH')) {
+                //         console.log('test', testWord)
+                //         count++
+                //         console.log("finalcount:", count)
                 //     }
+
                 // }
             }
             finalListOfWords.push(currentWord)
@@ -139,6 +146,15 @@ const writeToCsv = (EnglishToFrench, EnglishToCount, path) => {
     }
 }
 
+//write to txt file
+const writeToTextFile = (arrayOfLines, path) => {
+    let finalString = ""
+    for (line of arrayOfLines) {
+        finalString += line + '\n'
+    }
+    fs.writeFileSync(path, finalString)
+}
+
 //contains main flow
 const main = async () => {
     let EnglishToFrench = await readCSVToObj('./input_files/french_dictionary.csv')
@@ -147,7 +163,8 @@ const main = async () => {
     let returnedValues = replaceWords(InputFileArray, EnglishToFrench, EnglishToCount)
     let outputFileLines = returnedValues[0]
     EnglishToCount = returnedValues[1]
-    // writeToCsv(EnglishToFrench, EnglishToCount, './output_files/frequency.csv')
+    writeToCsv(EnglishToFrench, EnglishToCount, './output_files/frequency.csv')
+    writeToTextFile(outputFileLines, './output_files/t8.shakespeare.translated.txt')
     // console.log(InputFileArray)
 
 }
